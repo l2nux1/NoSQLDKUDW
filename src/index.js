@@ -1,13 +1,14 @@
 require('log-timestamp')
-const NoSQLDBKUDW = require('./engine/nosqldb-movie-comment')
 const express = require('express')
 const cors = require('cors')
-const defaultRouterv1 = require('./router/v1/default')
+const defaultRouterv1 = require('./router/v1/defaultRouter')
+const indexRouter = require('./router/v1/indexRouter')
 const app = express()
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
+app.use('/', indexRouter)
 app.use('/api/v1/default', defaultRouterv1)
 
 app.use((err, req, res, next) => {
@@ -18,10 +19,8 @@ app.use((err, req, res, next) => {
 
 function onStart(){
     console.log(`NoSQLKUDW ${process.env.npm_package_version} Start Listening ${port}`)
-    NoSQLDBKUDW.saveDBToFile()
-    NoSQLDBKUDW.loadDBFromFile()
 }
 
-port = process.env.LOCAL_PORT
+port = process.env.PORT || 3000
 app.listen(port, onStart)
 module.exports = app

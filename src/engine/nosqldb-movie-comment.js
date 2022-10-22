@@ -36,7 +36,7 @@ exports.clearDBFile = () => {
 }
 
 exports.loadDBFromFile = () => {
-    fs.readFile('./storage/db-storage', 'utf8', (err, data) => {
+    fs.readFile('./db-storage', 'utf8', (err, data) => {
       if (err)  {
         console.log('Error to load data from file')
         return false
@@ -56,7 +56,7 @@ exports.saveDBToFile = () => {
     obj.tableUser.push({ id: 2, email: 'coba@gmail.com', name: 'coba'})
 
     const jsonData = JSON.stringify(obj);
-    fs.writeFile('./storage/db-storage', jsonData, 'utf8', (err) => {
+    fs.writeFile('./db-storage', jsonData, 'utf8', (err) => {
         if (err){
             console.log('Write database error: ', err)
         }
