@@ -2,67 +2,82 @@
 const fs = require('fs')
 
 let obj = {
-    tableUser: [], //one user to many comment
-    comment: [], 
-    commentReply: [] 
+    user: [], 
+    comment: []
 }
 
-exports.postComment = (data) => {
+Array.prototype.customCommentFilter = function (fn) {
+    const filtered = []
 
+    for(let i=0; i<this.length; i++){
+        if(fn(this[i])){
+            const getUserInfo = obj.user.map(x => x.emailAddr).indexOf(this[i].emailAddr)
+            const userAlias = obj.user[getUserInfo].name
+            const userAvatar = obj.user[getUserInfo].avatar
+            filtered.push({userAlias, userAvatar, comment: this[i].comment})
+        }
+    }
+
+    return filtered
 }
 
-exports.readAllComment = () => {
-
+exports.postComment = (comment) => {
+    obj.comment.push(comment)
+    
+    console.log(obj.comment);
+    saveDBToFile()
 }
 
-exports. replyComment = () => {
-
+exports.getComment = (movie) => {
+    return obj.comment.customCommentFilter((data) => {
+        console.log(data.movie, movie)
+        return data.movie === movie
+    })    
 }
 
-exports.createUser = () => {
-
+exports.createUser = (data) => {
+    obj.user.push(data)
+    console.log('users: ', obj.user)
+    saveDBToFile()
 }
 
-exports.updateUser = () => {
-
+exports.getAllUsers = () => {
+    return obj.user
 }
 
-exports.deleteUser = () => {
+exports.getUser = (emailAddr) => {
+    const getUserInfo = obj.user.map(x => x.emailAddr).indexOf(emailAddr)
+    if (getUserInfo == -1) return null
 
+    console.log('result: ', obj.user[getUserInfo])
+    return obj.user[getUserInfo]
 }
 
-exports.clearDBFile = () => {
-
+exports.reloadDB = () => {
+    return loadDBFromFile()
 }
 
-exports.loadDBFromFile = () => {
+function loadDBFromFile(){
     fs.readFile('./db-storage', 'utf8', (err, data) => {
-      if (err)  {
-        console.log('Error to load data from file')
-        return false
-      }
-
-      obj = JSON.parse(data)
-      obj.tableUser.push({ id: 3, email: 'coba@gmail.com', name: 'coba'})      
-
-      console.log(obj)
-
-      return true
+        if (err)  {
+          console.log('Error to load data from file, use default object')
+          return
+        }
+        obj = JSON.parse(data)
+        console.log(obj)
     })
 }
 
-exports.saveDBToFile = () => {
-    obj.tableUser.push({ id: 1, email: 'test@gmail.com', name: 'test'})
-    obj.tableUser.push({ id: 2, email: 'coba@gmail.com', name: 'coba'})
-
-    const jsonData = JSON.stringify(obj);
+function saveDBToFile(){
+    
+    const jsonData = JSON.stringify(obj);    
     fs.writeFile('./db-storage', jsonData, 'utf8', (err) => {
         if (err){
             console.log('Write database error: ', err)
+            return false
         }
-        else{
-            console.log('Tables are written to file')
-        }
+        console.log('New data is written to file')
+        return true
     })
 
 }

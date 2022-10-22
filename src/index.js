@@ -3,6 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const defaultRouterv1 = require('./router/v1/defaultRouter')
 const indexRouter = require('./router/v1/indexRouter')
+const NoSQLKUDW = require('./engine/nosqldb-movie-comment')
 const app = express()
 
 app.use(express.json())
@@ -13,12 +14,13 @@ app.use('/api/v1/default', defaultRouterv1)
 
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-        return res.status(404).send({ status: 1002, msg: err.message, data: {} }); // Bad request
+        return res.status(404).send({ msg: err.message, data: {} }); // Bad request
     }
 });
 
 function onStart(){
-    console.log(`NoSQLKUDW ${process.env.npm_package_version} Start Listening ${port}`)
+    NoSQLKUDW.reloadDB()
+    console.log(`NoSQLKUDW ${process.env.npm_package_version} Start Listening ${port}`)    
 }
 
 port = process.env.PORT || 3000
