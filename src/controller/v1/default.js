@@ -1,4 +1,5 @@
 const NoSQLKUDW = require('../../engine/nosqldb-movie-comment')
+const { dirname } = require('path');
 
 exports.testAPI = async (req, res, next) => {
     res.status(200).send({ msg: 'OK', data: { info: 'NoSQLKUDW API', version: 'v1' } });
@@ -50,4 +51,26 @@ exports.getComment = async (req, res, next) => {
     console.log('movie: ', movie)
     const movieComments = NoSQLKUDW.getComment(movie)
     return res.status(200).send({ msg: 'OK', data: { movieComments }})
+}
+
+exports.getAllAvatar = async (req, res, next) => {
+    NoSQLKUDW.getAvatarFileName().then((avatars) => {
+        console.log('Total Avatar:', avatars.length)
+        return res.status(200).send({ msg: 'OK', data: {avatars}})
+    },(error) => {
+        return res.status(500).send({ msg: 'No Avatar found', data: {}})
+    })        
+}
+
+exports.getAvatarByName = async (req, res, next) => {
+    let avatarName = req.query.avatarName
+    console.log('avatarName: ',avatarName)
+    NoSQLKUDW.getAvatarImage(avatarName).then((filename) => {
+        const baseDir = dirname(require.main.filename)
+        const fullName = `${baseDir}/avatar/${filename}`
+        console.log('filename: ', fullName)
+        return res.sendFile(fullName)
+    }, (error) => {
+        return res.status(404).send({ msg: 'Image not found', data: {}})
+    })
 }

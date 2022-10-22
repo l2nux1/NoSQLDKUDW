@@ -6,6 +6,8 @@ let obj = {
     comment: []
 }
 
+const avatarDir = './src/avatar'
+
 Array.prototype.customCommentFilter = function (fn) {
     const filtered = []
 
@@ -55,6 +57,29 @@ exports.getUser = (emailAddr) => {
 
 exports.reloadDB = () => {
     return loadDBFromFile()
+}
+
+exports.getAvatarFileName = async () => {
+    return new Promise((resolve, reject) => {
+        fs.readdir(avatarDir, (err,files) => {
+            //console.log(files)
+            if (err){
+                reject(err)
+            }
+            resolve(files)
+        })    
+    })
+}
+
+exports.getAvatarImage = async (avatarName) => {
+    return new Promise((resolve, reject) => {
+        fs.access(`${avatarDir}/${avatarName}`, fs.F_OK, (err) => {
+            if (err){
+                reject(err)
+            }
+            resolve(avatarName)
+        })
+    })
 }
 
 function loadDBFromFile(){
